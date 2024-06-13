@@ -4,12 +4,15 @@ import { Model } from 'mongoose';
 import { User } from 'src/schemas/User.schema';
 import { CreateUserDto } from './dto/User.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
+import { checkRole } from 'src/utils/users/roles';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   createUser(createUserDto: CreateUserDto) {
+    createUserDto.role = checkRole(createUserDto.role);
+
     const newUser = new this.userModel(createUserDto);
     return newUser.save();
   }
@@ -20,6 +23,10 @@ export class UsersService {
 
   getUserById(id: string) {
     return this.userModel.findById(id);
+  }
+
+  getUserByUsername(username: string) {
+    return this.userModel.findOne({ username });
   }
 
   updateUser(id: string, updateUserDto: UpdateUserDto) {
