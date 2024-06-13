@@ -1,15 +1,7 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Get,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './Auth.service';
 import { SignInDto } from './dto/SignIn.dto';
-import { AuthGuard } from './Auth.guard';
+import { RefreshTokenDto } from './dto/RefreshToken.dto';
 
 @Controller('/auth')
 export class AuthControler {
@@ -21,9 +13,10 @@ export class AuthControler {
     return this.authService.signIn(signInDto);
   }
 
-  @Get('/profile')
-  @UseGuards(AuthGuard)
-  getProfile() {
-    return ['a'];
+  @HttpCode(HttpStatus.OK)
+  @Post('/refresh')
+  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
+    const tokens = await this.authService.refresh(refreshTokenDto);
+    return tokens;
   }
 }
